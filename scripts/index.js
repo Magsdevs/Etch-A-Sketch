@@ -8,6 +8,14 @@ const eraserBtn = document.getElementById('eraser-btn');
 const clearBtn = document.getElementById('clear-btn');
 const MIN_NUM = 0;
 const MAX_NUM = 255;
+const store = {
+  currentColor: undefined,
+};
+const colorsPicker = {
+  black: `rgb(0,0,0)`,
+  randomColor: undefined,
+  eraser: `rgb(255,255,255)`,
+};
 
 /////////////////// 256 sqr of 32px to fill Container
 let defaultGrid = 256;
@@ -25,10 +33,11 @@ function getRandomNumber(min, max) {
 }
 
 function getColor() {
-  return (color = `rgb(${getRandomNumber(MIN_NUM, MAX_NUM)},${getRandomNumber(
+  let color = `rgb(${getRandomNumber(MIN_NUM, MAX_NUM)},${getRandomNumber(
     MIN_NUM,
     MAX_NUM
-  )},${getRandomNumber(MIN_NUM, MAX_NUM)})`);
+  )},${getRandomNumber(MIN_NUM, MAX_NUM)})`;
+  return color;
 }
 
 function getDivs(multiplyFactor) {
@@ -77,8 +86,9 @@ function gridHandler(e) {
 }
 
 function mouseDown(e) {
+  const currentColor = store.currentColor || getColor();
   if (e.target.nodeName === 'DIV' && !e.target.id) {
-    e.target.style.background = `${getColor()}`;
+    e.target.style.background = currentColor;
     isDragging = true;
   }
 }
@@ -91,8 +101,9 @@ function preventDragDefault(e) {
 }
 
 function mouseOver(e) {
+  const currentColor = store.currentColor || getColor();
   if (isDragging && e.target.nodeName === 'DIV' && !e.target.id) {
-    e.target.style.background = `${getColor()}`;
+    e.target.style.background = currentColor;
   }
 }
 
@@ -107,3 +118,15 @@ document.body.addEventListener('dragstart', preventDragDefault);
 container.addEventListener('mouseover', mouseOver);
 
 range.addEventListener('input', gridHandler);
+
+blackBtn.addEventListener('click', handlerColorPicker);
+colorBtn.addEventListener('click', handlerColorPicker);
+eraserBtn.addEventListener('click', handlerColorPicker);
+clearBtn.addEventListener('click', () => {
+  range.value = 3;
+  getDivs(factor());
+});
+function handlerColorPicker(e) {
+  const { value } = e.target.classList;
+  store.currentColor = colorsPicker[value];
+}
